@@ -166,6 +166,7 @@ import Modal from 'react-bootstrap/Modal';
 import { BiPaperPlane, BiCloudDownload } from "react-icons/bi";
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import numWords from 'num-words';
 
 class InvoiceModal extends React.Component {
   generateInvoice = () => {
@@ -191,6 +192,7 @@ class InvoiceModal extends React.Component {
     const defaultInfo = {
       companyName: 'John Doe Company',
       companyDetails: '',
+      companyDetails1:'',
       invoiceNumber: 'Invoice No',
       billTo: '',
       billToAddress: '',
@@ -209,6 +211,7 @@ class InvoiceModal extends React.Component {
     const {
       companyName,
       companyDetails,
+      companyDetails1,
       invoiceNumber,
       billTo,
       billToAddress,
@@ -225,13 +228,17 @@ class InvoiceModal extends React.Component {
     } = { ...defaultInfo, ...info };
 
     const subTotal = items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-    const taxAmount = parseFloat(info.taxAmmount) || 0;
-    const discountAmount = parseFloat(info.discountAmmount) || 0;
+    const cgstAmount = (subTotal * (info.cgst / 100)).toFixed(2);
+    const sgstAmount = (subTotal * (info.sgst / 100)).toFixed(2);
+    const taxAmount = parseFloat(info.taxAmount) || 0;
+    const discountAmount = parseFloat(info.discountAmount) || 0;
     const handlingCharges = parseFloat(info.handlingcharge) || 0.0;
     const haulingCharges = parseFloat(info.haulcharge) || 0.0;
     const shippingCharges = parseFloat(info.shippingcharge) || 0.0;
     const deliveryCharges = parseFloat(info.deliverycharge) || 0.0;
-    const total = subTotal + taxAmount - discountAmount + handlingCharges + haulingCharges + shippingCharges + deliveryCharges;
+    const total = subTotal + parseFloat(cgstAmount) + parseFloat(sgstAmount) + taxAmount - discountAmount + handlingCharges + haulingCharges + shippingCharges + deliveryCharges;
+
+    const totalInWords = numWords(Math.round(total));
 
     return (
       <div>
@@ -245,9 +252,14 @@ class InvoiceModal extends React.Component {
 
             <div className="p-4">
               <Row className="mb-4">
+              <Col md={4}>
+                  <div className="fw-bold mt-2">Invoice No:</div>
+                  <div>{invoiceNumber}</div>
+                </Col>
                 <Col md={4}>
                   <div className="fw-bold">From:</div>
                   <div>{companyDetails}</div>
+                  <div>{companyDetails1}</div>
                   <div>{invoiceNumber}</div>
                 </Col>
 
@@ -309,71 +321,75 @@ class InvoiceModal extends React.Component {
                     <td colSpan="2" className="fw-bold">SUBTOTAL</td>
                     <td className="text-end">{currency} {parseFloat(subTotal).toFixed(2)}</td>
                   </tr>
-                  {taxAmount !== 0 &&
-                    <tr className="text-end">
-                      <td colSpan="2" className="fw-bold">TAX</td>
-                      <td className="text-end">{currency} {parseFloat(taxAmount).toFixed(2)}</td>
-                    </tr>
-                  }
-                  {discountAmount !== 0 &&
-                    <tr className="text-end">
-                      <td colSpan="2" className="fw-bold">DISCOUNT</td>
-                      <td className="text-end">{currency} {parseFloat(discountAmount).toFixed(2)}</td>
-                    </tr>
-                  }
-                  {handlingCharges !== 0 &&
-                    <tr className="text-end">
-                      <td colSpan="2" className="fw-bold">HANDLING CHARGES</td>
-                      <td className="text-end">{currency} {parseFloat(handlingCharges).toFixed(2)}</td>
-                    </tr>
-                  }
-                  {shippingCharges !== 0 &&
-                    <tr className="text-end">
-                      <td colSpan="2" className="fw-bold">SHIPPING CHARGES</td>
-                      <td className="text-end">{currency} {parseFloat(shippingCharges).toFixed(2)}</td>
-                    </tr>
-                  }
-                  {haulingCharges !== 0 &&
-                    <tr className="text-end">
-                      <td colSpan="2" className="fw-bold">HAULING CHARGES</td>
-                      <td className="text-end">{currency} {parseFloat(haulingCharges).toFixed(2)}</td>
-                    </tr>
-                  }
-                  {deliveryCharges !== 0 &&
-                    <tr className="text-end">
-                      <td colSpan="2" className="fw-bold">DELIVERY CHARGES</td>
-                      <td className="text-end">{currency} {parseFloat(deliveryCharges).toFixed(2)}</td>
-                    </tr>
-                  }
+                  {parseFloat(cgstAmount) > 0 &&
                   <tr className="text-end">
-                    <td colSpan="2" className="fw-bold">TOTAL</td>
-                    <td className="text-end">{currency} {parseFloat(total).toFixed(2)}</td>
+                    <td colSpan="2" className="fw-bold">CGST</td>
+                    <td className="text-end">{currency} {cgstAmount}</td>
+                  </tr>
+                  }
+                  {parseFloat(sgstAmount) > 0 &&
+                  <tr className="text-end">
+                    <td colSpan="2" className="fw-bold">SGST</td>
+                    <td className="text-end">{currency} {sgstAmount}</td>
+                  </tr>
+                  }
+                  {taxAmount > 0 &&
+                  <tr className="text-end">
+                    <td colSpan="2" className="fw-bold">IGST</td>
+                    <td className="text-end">{currency} {taxAmount}</td>
+                  </tr>
+                  }
+                  {discountAmount > 0 &&
+                  <tr className="text-end">
+                    <td colSpan="2" className="fw-bold">DISCOUNT</td>
+                    <td className="text-end">{currency} {discountAmount}</td>
+                  </tr>
+                  }
+                  {handlingCharges > 0 &&
+                  <tr className="text-end">
+                    <td colSpan="2" className="fw-bold">HANDLING CHARGES</td>
+                    <td className="text-end">{currency} {parseFloat(handlingCharges).toFixed(2)}</td>
+                  </tr>
+                  }
+                  {haulingCharges > 0 && 
+                  <tr className="text-end">
+                    <td colSpan="2" className="fw-bold">HAULAGE CHARGES</td>
+                    <td className="text-end">{currency} {parseFloat(haulingCharges).toFixed(2)}</td>
+                  </tr>
+                  }
+                  {shippingCharges > 0 &&
+                  <tr className="text-end">
+                    <td colSpan="2" className="fw-bold">SHIPPING CHARGES</td>
+                    <td className="text-end">{currency} {parseFloat(shippingCharges).toFixed(2)}</td>
+                  </tr>
+                  } 
+                  {deliveryCharges > 0 &&
+                  <tr className="text-end">
+                    <td colSpan="2" className="fw-bold">DELIVERY CHARGES</td>
+                    <td className="text-end">{currency} {parseFloat(deliveryCharges).toFixed(2)}</td>
+                  </tr>
+                  }
+                  <tr className="text-end fw-bold">
+                    <td colSpan="2" className="h4">TOTAL</td>
+                    <td className="h4 text-end">{currency} {parseFloat(total).toFixed(2)}</td>
+                  </tr>
+                  <tr className="text-end">
+                    <td colSpan="2" className="fw-bold">TOTAL IN WORDS</td>
+                    <td className="text-end">{totalInWords}</td>
                   </tr>
                 </tbody>
               </Table>
 
-              {notes &&
-                <div className="bg-light py-3 px-4 rounded">
-                  {notes}
-                </div>
-              }
+              <div className="bg-light py-3 px-4">
+                <p className="mb-0">{notes}</p>
+              </div>
             </div>
           </div>
-
-          <div className="pb-4 px-4">
-            <Row>
-              <Col md={6}>
-                <Button variant="primary" className="d-block w-100" onClick={this.generateInvoice}>
-                  <BiPaperPlane style={{ width: '15px', height: '15px', marginTop: '-3px' }} className="me-2" />Send Invoice
-                </Button>
-              </Col>
-              <Col md={6}>
-                <Button variant="outline-primary" className="d-block w-100 mt-3 mt-md-0" onClick={this.generateInvoice}>
-                  <BiCloudDownload style={{ width: '15px', height: '15px', marginTop: '-3px' }} className="me-2" />Download PDF
-                </Button>
-              </Col>
-            </Row>
-          </div>
+          <Modal.Footer>
+            <Button variant="success" onClick={this.generateInvoice}><BiCloudDownload className="me-2" />Download PDF</Button>
+            <Button variant="primary" onClick={this.generateInvoice}><BiPaperPlane className="me-2" />Send Invoice</Button>
+            <Button variant="secondary" onClick={closeModal}>Close</Button>
+          </Modal.Footer>
         </Modal>
       </div>
     );
@@ -381,6 +397,4 @@ class InvoiceModal extends React.Component {
 }
 
 export default InvoiceModal;
-
-
 

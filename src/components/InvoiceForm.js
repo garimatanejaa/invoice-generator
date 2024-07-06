@@ -451,11 +451,14 @@ class InvoiceForm extends React.Component {
       billFromAddress: '',
       companyName: '',
       companyDetails: '',
+      companyDetails1:'',
       notes: '',
       total: '0.00',
       subTotal: '0.00',
       taxRate: '0.00',
       taxAmmount: '0.00',
+      cgst: '0.00',
+      sgst:'0.00',
       discountRate: '',
       discountAmmount: '0.00',
       title: 'Invoice', // Default title set to Invoice
@@ -502,7 +505,7 @@ class InvoiceForm extends React.Component {
   }
 
   handleCalculateTotal() {
-    const { items, taxRate, discountRate, haulcharge, deliverycharge, handlingcharge, shippingcharge } = this.state;
+    const { items, taxRate, discountRate, haulcharge, deliverycharge, handlingcharge, shippingcharge,cgst,sgst } = this.state;
   
     // Calculate subtotal
     let subTotal = 0;
@@ -513,7 +516,7 @@ class InvoiceForm extends React.Component {
     subTotal = parseFloat(subTotal).toFixed(2);
   
     // Calculate tax amount
-    const taxAmmount = (subTotal * (taxRate / 100)).toFixed(2);
+    const taxAmount = (subTotal * ((taxRate / 100) + (cgst / 100) + (sgst / 100))).toFixed(2);
   
     // Calculate discount amount
     const discountAmmount = (subTotal * (discountRate / 100)).toFixed(2);
@@ -522,12 +525,12 @@ class InvoiceForm extends React.Component {
     const additionalCharges = parseFloat(haulcharge) + parseFloat(deliverycharge) + parseFloat(handlingcharge) + parseFloat(shippingcharge);
   
     // Calculate total
-    let total = subTotal - discountAmmount + parseFloat(taxAmmount) + additionalCharges;
+    let total = subTotal - discountAmmount + parseFloat(taxAmount) + additionalCharges;
     total = parseFloat(total).toFixed(2);
   
     this.setState({
       subTotal,
-      taxAmmount,
+      taxAmount,
       discountAmmount,
       total
     });
@@ -646,6 +649,15 @@ class InvoiceForm extends React.Component {
                 autoComplete="off"
                 required
               />
+              <Form.Control
+                placeholder="Line 2"
+                value={this.state.companyDetails1}
+                type="text"
+                name="companyDetails"
+                className="my-2"
+                onChange={(event) => this.editField(event)}
+                autoComplete="off"
+              />
               <hr className="my-4" />
               <Row className="mb-5">
                 <Col>
@@ -741,7 +753,7 @@ class InvoiceForm extends React.Component {
           <Col md={4} lg={3}>
             <Card className="p-4 my-3 my-xl-4">
               <Form.Group className="mb-3">
-                <Form.Label className="fw-bold">Hauling Charges:</Form.Label>
+                <Form.Label className="fw-bold">Haulage Charges:</Form.Label>
                 <InputGroup>
                   <InputGroup.Text>{this.state.currency}</InputGroup.Text>
                   <Form.Control
@@ -811,7 +823,7 @@ class InvoiceForm extends React.Component {
                rows={1}
                />
               <Form.Group className="mb-3">
-                <Form.Label className="fw-bold">Tax Rate:</Form.Label>
+                <Form.Label className="fw-bold">IGST Rate:</Form.Label>
                 <InputGroup>
                   <Form.Control
                     type="number"
@@ -820,7 +832,37 @@ class InvoiceForm extends React.Component {
                     onChange={(event) => this.editField(event)}
                     min="0"
                     step="0.01"
-                    required
+                    
+                  />
+                  <InputGroup.Text>%</InputGroup.Text>
+                </InputGroup>
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label className="fw-bold">CGST Rate:</Form.Label>
+                <InputGroup>
+                  <Form.Control
+                    type="number"
+                    value={this.state.cgst}
+                    name="cgst"
+                    onChange={(event) => this.editField(event)}
+                    min="0"
+                    step="0.01"
+                    
+                  />
+                  <InputGroup.Text>%</InputGroup.Text>
+                </InputGroup>
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label className="fw-bold">SGST Rate:</Form.Label>
+                <InputGroup>
+                  <Form.Control
+                    type="number"
+                    value={this.state.sgst}
+                    name="sgst"
+                    onChange={(event) => this.editField(event)}
+                    min="0"
+                    step="0.01"
+                    
                   />
                   <InputGroup.Text>%</InputGroup.Text>
                 </InputGroup>
