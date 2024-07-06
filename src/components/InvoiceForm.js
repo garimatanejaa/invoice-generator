@@ -633,6 +633,7 @@ class InvoiceForm extends React.Component {
                       type="text"
                       name="companyName"
                       onChange={(event) => this.editField(event)}
+                      autoComplete="off"
                       required
                     />
                   </div>
@@ -670,7 +671,7 @@ class InvoiceForm extends React.Component {
                     name="billTo"
                     className="my-2"
                     onChange={(event) => this.editField(event)}
-                    autoComplete="name"
+                    autoComplete="off"
                   />
                   <Form.Control
                     placeholder="Line 2"
@@ -679,7 +680,7 @@ class InvoiceForm extends React.Component {
                     name="billTo1"
                     className="my-2"
                     onChange={(event) => this.editField(event)}
-                    autoComplete="name1"
+                    autoComplete="off"
                   />
                   <Form.Control
                     placeholder="Billing address"
@@ -687,7 +688,7 @@ class InvoiceForm extends React.Component {
                     type="text"
                     name="billToAddress"
                     className="my-2"
-                    autoComplete="address"
+                    autoComplete="off"
                     onChange={(event) => this.editField(event)}
                   />
                 </Col>
@@ -701,7 +702,7 @@ class InvoiceForm extends React.Component {
                     name="billFrom"
                     className="my-2"
                     onChange={(event) => this.editField(event)}
-                    autoComplete="name"
+                    autoComplete="off"
                   />
                   <Form.Control
                     placeholder="Line 2"
@@ -710,7 +711,7 @@ class InvoiceForm extends React.Component {
                     name="billFrom1"
                     className="my-2"
                     onChange={(event) => this.editField(event)}
-                    autoComplete="name1"
+                    autoComplete="off"
                   />
                   <Form.Control
                     placeholder="Shipping address"
@@ -718,7 +719,7 @@ class InvoiceForm extends React.Component {
                     type="text"
                     name="billFromAddress"
                     className="my-2"
-                    autoComplete="address"
+                    autoComplete="off"
                     onChange={(event) => this.editField(event)}
                   />
                 </Col>

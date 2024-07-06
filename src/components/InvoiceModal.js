@@ -167,6 +167,12 @@ import { BiPaperPlane, BiCloudDownload } from "react-icons/bi";
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import numWords from 'num-words';
+import {
+  EmailShareButton,
+  EmailIcon,
+  WhatsappShareButton,
+  WhatsappIcon
+} from 'react-share';
 
 class InvoiceModal extends React.Component {
   generateInvoice = () => {
@@ -252,7 +258,7 @@ class InvoiceModal extends React.Component {
 
             <div className="p-4">
               <Row className="mb-4">
-              <Col md={4}>
+                <Col md={4}>
                   <div className="fw-bold mt-2">Invoice No:</div>
                   <div>{invoiceNumber}</div>
                 </Col>
@@ -374,20 +380,29 @@ class InvoiceModal extends React.Component {
                     <td className="h4 text-end">{currency} {parseFloat(total).toFixed(2)}</td>
                   </tr>
                   <tr className="text-end">
-                    <td colSpan="2" className="fw-bold">TOTAL IN WORDS</td>
-                    <td className="text-end">{totalInWords}</td>
-                  </tr>
+                    <td colSpan="2" className="fw-bold">TOTAL IN WORDS Rs.</td>
+                    <td className="text-end">{totalInWords} rupees only.</td>
+                    </tr>
+
                 </tbody>
               </Table>
 
-              <div className="bg-light py-3 px-4">
+              <div className="bg-white py-3 px-4">
                 <p className="mb-0">{notes}</p>
+              </div>
+              <div className="bg-white py-3 px-4">
+                <p className="mb-0">This is a computer generated reciept.</p>
               </div>
             </div>
           </div>
           <Modal.Footer>
             <Button variant="success" onClick={this.generateInvoice}><BiCloudDownload className="me-2" />Download PDF</Button>
-            <Button variant="primary" onClick={this.generateInvoice}><BiPaperPlane className="me-2" />Send Invoice</Button>
+            <EmailShareButton url="#" subject="Invoice" body="Here is your invoice.">
+              <Button variant="primary"><BiPaperPlane className="me-2" />Share via Email</Button>
+            </EmailShareButton>
+            <WhatsappShareButton url="#" title="Invoice">
+              <Button variant="primary"><BiPaperPlane className="me-2" />Share via WhatsApp</Button>
+            </WhatsappShareButton>
             <Button variant="secondary" onClick={closeModal}>Close</Button>
           </Modal.Footer>
         </Modal>
